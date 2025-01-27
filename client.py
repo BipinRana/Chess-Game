@@ -1,6 +1,24 @@
 import socketio
+from GameController import GameController
 
 sio = socketio.Client()
+
+SERVER_URL = 'https://Chess-Game.onrender.com'
+
+
+class ChessClient:
+    def __init__(self):
+        self.sio = socketio.Client()
+        self.connect_to_server()
+
+    def connect_to_server(self):
+        try:
+            self.sio.connect(SERVER_URL)
+            print("Connected to server")
+        except Exception as e:
+            print(f"Connection failed: {e}")
+#initialize GameController
+#game= GameController()
 
 username = input("Enter your username: ")
 room = input("Enter room name to join: ")
@@ -26,7 +44,7 @@ def disconnect():
 def send_move(move):
     sio.emit('move', {'room': room, 'move': move})
 
-sio.connect('http://localhost:5000')
+sio.connect('http://192.168.1.73:5000')
 
 while True:
     move = input("Enter your move (or 'quit' to leave): ")
@@ -35,3 +53,4 @@ while True:
         sio.disconnect()
         break
     send_move(move)
+
