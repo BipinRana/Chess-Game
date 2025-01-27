@@ -1,12 +1,20 @@
+import os
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template
+import secrets
 from flask_socketio import SocketIO, join_room, leave_room, emit
 from GameController import GameController
 
+
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
-socketio = SocketIO(app, cors_allowed_origins="*")
+app.config['SECRET_KEY'] = secrets.token_hex(16)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 rooms = {}  # Dictionary to track active rooms and players
+
+#game_controller = GameController()
 
 @app.route('/')
 def index():
@@ -44,4 +52,10 @@ def handle_move(data):
     print(f"Move in room {room}: {move}")
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000)
+
+     
+    port = int(os.environ.get("PORT", 10000))
+    socketio.run(app, host='192.168.1.73', port=5000, debug=True, use_reloader=False)
+
+
+
