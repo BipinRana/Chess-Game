@@ -518,7 +518,7 @@ class GameController:
             if 'king' in ChessData.get_current_state()['piece']:
                 image2 = ChessData.get_current_state()['piece'][6:].capitalize() 
             image2 += ChessData.get_current_state()['piece'][:5].capitalize() 
-            print(f'adding after2 {ChessData.get_current_state()['piece']}')
+            print(f"adding after2 {ChessData.get_current_state()['piece']}")
             self.chessboard.add_piece(ChessPiece(ChessData.get_current_state()['piece'], ChessData.get_current_state()['piece'][:5], f"Assets/{image2}.png", [old_x2 * 100 + 20, 107.5 + old_y2 * 77.5], self.screen))
             ChessData.undo()
         if 715 <= mouse_pos[0] <= 765 and 25 <= mouse_pos[1] <= 75:
