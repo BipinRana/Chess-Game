@@ -50,7 +50,7 @@ class ChessPiece(pygame.sprite.Sprite):
             x = int((x - 50) / 100)
             y = int((y - 155) / 75)
             piece_name = ChessData.get_chess_board()[x][y]
-            if ChessData.get_chess_turn() in piece_name:  # Ensure turn matches the piece clicked
+            if ChessData.get_chess_turn() in piece_name and ((ChessData.get_multiplayer_flag() and ChessData.get_game_color() == ChessData.get_chess_turn()) or not ChessData.get_multiplayer_flag()):  # Ensure turn matches the piece clicked
                 ChessData.update_active_piece(piece_name)
             else:
                 return
@@ -102,7 +102,7 @@ class ChessPiece(pygame.sprite.Sprite):
                                     ChessData.update_get_castling_side("left")
                             if ('black_pawn' in ChessData.get_active_piece() and new_y == 3 and old_y == 1) or ('white_pawn' in ChessData.get_active_piece() and new_y == 4 and old_y == 6):
                                 ChessData.update_en_passant_piece(int(new_x), int(new_y))
-                            promotion = 7 if ChessData.get_chess_turn() == "black" else 0
+                            promotion = 0 if (ChessData.get_chess_turn() == "black" and ChessData.get_game_color() =='black') or (ChessData.get_chess_turn() == "white" and ChessData.get_game_color() =='white') else 7
                             if 'pawn' in ChessData.get_active_piece() and new_y == promotion:
                                 ChessData.update_promotion_piece((int(new_x), int(new_y)), ChessData.get_active_piece())
                             if ChessData.get_en_passant_piece():
@@ -130,7 +130,8 @@ class ChessPiece(pygame.sprite.Sprite):
                             if not ChessData.get_removed_piece():
                                 ChessData.update_active_piece("")
                             ChessData.update_suggested_moves(None)
-
+                            if ChessData.get_multiplayer_flag():
+                                ChessData.update_multiplayer_move_flag(True)
                     if not self.updated_flag:
                         active_piece = ChessData.get_active_piece()
                         x, y = np.argwhere(ChessData.get_chess_board() == active_piece)[0]
@@ -174,7 +175,7 @@ class ChessPiece(pygame.sprite.Sprite):
         """
         king_location = np.argwhere(chess_board == (ChessData.get_chess_turn() + "_king"))[0]
         if piece == ChessData.get_chess_turn() + "_king" and not ChessData.get_has_piece_moved(piece) and not is_piece_in_check(ChessData.get_chess_turn(), ChessData.get_chess_board(), king_location):
-            y = 7 if ChessData.get_chess_turn() == "white" else 0
+            y = 7 if (ChessData.get_chess_turn() == "white" and ChessData.get_game_color()=='white') or (ChessData.get_chess_turn() == "black" and ChessData.get_game_color()=='black')  else 0
             if ChessPiece.is_right_castling_available() and ChessData.get_chess_board()[5][y] == "." and ChessData.get_chess_board()[6][y] == "." and not is_piece_in_check(ChessData.get_chess_turn(), ChessData.get_chess_board(), [5,y]) and not is_piece_in_check(ChessData.get_chess_turn(), ChessData.get_chess_board(), [6,y]):
                 moves = np.append(moves, [[6, y]], axis=0)
             if ChessPiece.is_left_castling_available() and ChessData.get_chess_board()[3][y] == "." and ChessData.get_chess_board()[2][y] == "." and ChessData.get_chess_board()[1][y] == "." and not is_piece_in_check(ChessData.get_chess_turn(), ChessData.get_chess_board(), [2,y]) and not is_piece_in_check(ChessData.get_chess_turn(), ChessData.get_chess_board(), [3,y]):
@@ -187,6 +188,7 @@ class ChessPiece(pygame.sprite.Sprite):
         Handles move generation for pawns.
         """
         # Implementation of pawn-specific logic goes here
+        
         current_position = np.argwhere(chess_board_arg == piece)
         possible_moves = np.empty((0, 2),dtype=int)
         x_coord,y_coord=current_position[0]
@@ -194,11 +196,20 @@ class ChessPiece(pygame.sprite.Sprite):
         if ChessData.get_en_passant_piece() and [x_coord, y_coord] in ChessData.get_en_passant_piece()['initial']:
 
             possible_moves = np.append(possible_moves, [ChessData.get_en_passant_piece()['final']], axis=0)
+        
+        
         pawn_takes_one,pawn_takes_two=np.array([[-1,-1]]),np.array([[1,-1]])
         pawn_takes_color="black"
         if("black" in piece):
             pawn_takes_one,pawn_takes_two=np.array([[-1,1]]),np.array([[1,1]])
             pawn_takes_color="white"
+
+        if ChessData.get_game_color() == 'black':
+            pawn_takes_one,pawn_takes_two=np.array([[-1,1]]),np.array([[1,1]])
+            if("black" in piece):
+                pawn_takes_one,pawn_takes_two=np.array([[-1,-1]]),np.array([[1,-1]])
+
+
         pawn_takes_one_x,pawn_takes_one_y= pawn_takes_one[0]
         pawn_takes_two_x,pawn_takes_two_y= pawn_takes_two[0]
         if (current_position[0][0] + pawn_takes_one_x <= 7 and
@@ -215,19 +226,20 @@ class ChessPiece(pygame.sprite.Sprite):
             possible_moves = np.append(possible_moves, current_position + pawn_takes_two, axis=0)
 
         first_move=np.array([[0, -1]])
-        if ("black" in piece): 
+        if (("black" in piece and not ChessData.get_game_color() =='black') or ("white" in piece and not ChessData.get_game_color() =='white')): 
             first_move=np.array([[0, 1]])
+
         if (y_coord+first_move[0][1]<8 and y_coord+first_move[0][1]>=0 and "." in chess_board_arg[x_coord][y_coord+first_move[0][1]]):
             possible_moves = np.append(possible_moves, current_position + first_move, axis=0)
         else:
             return possible_moves   
         second_move=np.empty((0,2))
-        if y_coord==6 and "white" in piece:
+        if (y_coord==6 and "white" in piece and ChessData.get_game_color()=='white') or (y_coord==6 and 'black' in piece and ChessData.get_game_color()=='black'):
             second_move = np.array([[0, -2]])
-        elif ("black" in piece and y_coord==1):
-            second_move = np.array([[0, 2]])
+        elif (y_coord==1 and "white" in piece and ChessData.get_game_color()=='black' or (y_coord==1 and 'black' in piece and ChessData.get_game_color()=='white')):
+            second_move = np.array([[0, 2]])  
         else:
-            return possible_moves                     
+            return possible_moves                
         if ("." in chess_board_arg[x_coord][y_coord+second_move[0][1]]):
             possible_moves = np.append(possible_moves, current_position + second_move, axis=0)
 
@@ -464,7 +476,7 @@ def is_piece_in_check(color, chess_board,piece_location):
             each_piece_possible_moves = ChessPiece.get_possible_moves(each_piece,chess_board)
             for takes_move in each_piece_possible_moves:
                 takes_move_x, takes_move_y = map(int, takes_move)
-                if (takes_move_x, takes_move_y) == tuple(piece_location):
+                if np.isclose([takes_move_x, takes_move_y], piece_location).all():
                     return True 
         return False
 
