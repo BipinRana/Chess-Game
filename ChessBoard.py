@@ -36,6 +36,7 @@ class ChessBoard(pygame.sprite.Sprite):
         self.pieces.update()  # Call the update method for all pieces if needed
 
     def remove_piece(self, piece_name):
+        
         if piece_name in self.piece_dict:
             piece = self.piece_dict[piece_name]
             piece.kill()  # Removes the sprite from all groups

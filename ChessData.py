@@ -47,6 +47,10 @@ class ChessData:
     show_suggested_moves = False
     white_removed = []
     black_removed = []
+    multiplayer = False
+    multiplayer_move = False
+    opp_move={}
+    game_color='white'
 
     @classmethod
     def get_chess_board(cls):
@@ -311,3 +315,35 @@ class ChessData:
     def reset_removed_list(cls):
         cls.white_removed=[]
         cls.black_removed=[]
+
+    @classmethod
+    def update_multiplayer_flag(cls,bool):
+        cls.multiplayer = bool
+
+    @classmethod
+    def update_multiplayer_move_flag(cls,bool):
+        cls.multiplayer_move = bool
+
+    @classmethod
+    def get_multiplayer_flag(cls):
+        return cls.multiplayer
+
+    @classmethod
+    def get_multiplayer_move_flag(cls):
+        return cls.multiplayer_move 
+    
+    @classmethod
+    def update_opponent(cls,move):
+        cls.opp_move = move
+
+    @classmethod
+    def get_opponent_response(cls):
+        return cls.opp_move
+
+    @classmethod
+    def game_color_update(cls,color):
+        cls.game_color = color
+
+    @classmethod 
+    def get_game_color(cls):
+        return cls.game_color
