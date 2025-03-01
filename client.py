@@ -34,7 +34,10 @@ class ChessClient:
 
     def connect_to_server(self, url):
         try:
-            self.sio.connect(url)
+            if self.sio.connected:
+                self.sio.disconnect()
+            self.sio.connect(url, transports=['websocket', 'polling'])
+            print("Connected successfully!")
         except Exception as e:
             print(f"Failed to connect to server: {e}")
 

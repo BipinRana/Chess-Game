@@ -458,7 +458,7 @@ class GameController:
                         self.singleplayer=False
                         ChessData.update_multiplayer_flag(True)
                         self.piece_count= {'black_queen':1,'black_bishop':2,'black_knight':2,'black_rook':2,'white_queen':1,'white_bishop':2,'white_knight':2,'white_rook':2}
-                        self.client.connect_to_server('http://localhost:5000')
+                        self.client.connect_to_server('https://chessserver-jnhk.onrender.com')
                         # Keep the client running
 
 
