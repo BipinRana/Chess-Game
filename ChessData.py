@@ -301,11 +301,19 @@ class ChessData:
         return [old_x, old_y],[new_x, new_y]
 
     @classmethod
-    def handle_removed_pieces_pixels(cls,piece):
-        if 'white' in piece and piece not in cls.white_removed:
-            cls.white_removed+=[piece[6:-1].capitalize()]
-        elif piece not in cls.black_removed:
-            cls.black_removed+=[piece[6:-1].capitalize()]
+    def handle_removed_pieces_pixels(cls,piece,command=True):
+        if 'white' in piece: 
+            if piece not in cls.white_removed and command:
+                cls.white_removed+=[piece]
+            else:
+                cls.white_removed.remove(piece)
+
+        if 'black' in piece: 
+            if piece not in cls.black_removed:
+                cls.black_removed+=[piece]
+            else:
+                cls.black_removed.remove(piece)
+            
 
     @classmethod
     def get_removed_list(cls):

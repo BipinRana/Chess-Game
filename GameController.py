@@ -6,6 +6,7 @@ from ChessData import ChessData
 import random
 from stockfish import Stockfish
 from client import ChessClient
+import re
 
 class GameController:
     
@@ -202,12 +203,13 @@ class GameController:
         self.updated_flag = True
         piece_position = ChessData.get_chess_board()
         old_x, old_y = np.argwhere(piece_position == piece)[0]
-        self.capture_piece_if_needed(new_x, new_y)
-        self.handle_castling_for_king(new_x, new_y, piece_position)
         if history:
             ChessData.add_moves_to_history(history)
         else:
             ChessData.add_moves_to_history({"piece": piece, "old": [old_x, old_y], "new": [new_x, new_y], "castle": False,'enpassant':False, "promotion": False, "removed": '.'})
+        self.capture_piece_if_needed(new_x, new_y)
+        self.handle_castling_for_king(new_x, new_y, piece_position)
+        
         piece_position[old_x][old_y] = "."
         piece_position[new_x][new_y] = piece
         promotion_bool = False
@@ -228,8 +230,10 @@ class GameController:
     def capture_piece_if_needed(self, new_x, new_y):
         if ChessData.get_chess_board()[new_x][new_y] != ".":
             captured_piece = ChessData.get_chess_board()[new_x][new_y]
+            ChessData.get_current_state()['removed'] = captured_piece
             ChessData.update_removed_piece(captured_piece)
             ChessData.handle_removed_pieces_pixels(captured_piece)
+            
         else:
             ChessData.update_move_sound(True)
 
@@ -404,7 +408,6 @@ class GameController:
                         self.chessboard.remove_piece('white_king')
                         for piece in ChessData.get_chess_board().flatten():
                             if piece != '.':
-                                print(piece)
                                 self.chessboard.remove_piece(piece)
                         self.menu_over=True
                         self.game_over = False  # Exit game over state
@@ -523,6 +526,7 @@ class GameController:
 
     def handle_side_menu_options(self,mouse_pos):
         if 645 <= mouse_pos[0] <= 695 and 25 <= mouse_pos[1] <= 75 and ChessData.board_history.get_undo_state():
+            ChessData.handle_removed_pieces_pixels(ChessData.get_current_state()['removed'],False)
             new_chessboard = np.copy(ChessData.get_chess_board())
             old_x,old_y=ChessData.get_current_state()['old']
             new_x,new_y=ChessData.get_current_state()['new']
@@ -568,7 +572,6 @@ class GameController:
             self.chessboard.add_piece(ChessPiece(ChessData.get_current_state()['piece'], ChessData.get_current_state()['piece'][:5], f"Assets/{image}.png", [old_x * 100 + 20, 107.5 + old_y * 77.5], self.screen))
             ChessData.undo()
             
-            
             ChessData.update_enpassant_count('+')
             ChessData.moves_made = ChessData.moves_made[:-1]
             new_chessboard2 = np.copy(ChessData.get_chess_board())
@@ -601,15 +604,13 @@ class GameController:
                 new_y2=new_y2+sign
             if new_chessboard2[new_x2][new_y2] != ".":
                 self.chessboard.add_piece(ChessPiece(ChessData.get_current_state()['removed'], ChessData.get_current_state()['removed'][:5], f"Assets/{ChessData.get_current_state()['removed'][6:-1].capitalize() + ChessData.get_current_state()['removed'][:5].capitalize()}.png", [new_x2 * 100 + 20, 107.5 + new_y2 * 77.5], self.screen)) 
-            
-            
+            ChessData.handle_removed_pieces_pixels(ChessData.get_current_state()['removed'],False)
             ChessData.update_chess_board(new_chessboard2)
             self.chessboard.remove_piece(ChessData.get_current_state()['piece'])
             image2 = ChessData.get_current_state()['piece'][6:-1].capitalize() 
             if 'king' in ChessData.get_current_state()['piece']:
                 image2 = ChessData.get_current_state()['piece'][6:].capitalize() 
             image2 += ChessData.get_current_state()['piece'][:5].capitalize() 
-            print(f'adding after2 {ChessData.get_current_state()['piece']}')
             self.chessboard.add_piece(ChessPiece(ChessData.get_current_state()['piece'], ChessData.get_current_state()['piece'][:5], f"Assets/{image2}.png", [old_x2 * 100 + 20, 107.5 + old_y2 * 77.5], self.screen))
             ChessData.undo()
         if 715 <= mouse_pos[0] <= 765 and 25 <= mouse_pos[1] <= 75:
@@ -781,14 +782,16 @@ class GameController:
         if ChessData.get_game_color() == 'black':
             place = [727.5, 7.5]
         for count,piece in enumerate(white):
-            piece_img = pygame.image.load(f"Assets/{piece}White.png").convert_alpha()  # Use your own marker image here
+            name = re.search(r'_([A-Za-z]+)', piece).group(1).capitalize()
+            piece_img = pygame.image.load(f"Assets/{name}White.png").convert_alpha()  # Use your own marker image here
             piece_img = pygame.transform.scale(piece_img, (60, 60)) 
-            if piece != 'Rook':
+            if name != 'Rook':
                 self.screen.blit(piece_img, (20+30*count, place[0]))
             else:
                 self.screen.blit(piece_img, (20+30*count, place[0]+5))
         for count,piece in enumerate(black):
-            piece_img = pygame.image.load(f"Assets/{piece}Black.png").convert_alpha()  # Use your own marker image here
+            name = re.search(r'_([A-Za-z]+)', piece).group(1).capitalize()
+            piece_img = pygame.image.load(f"Assets/{name}Black.png").convert_alpha()  # Use your own marker image here
             piece_img = pygame.transform.scale(piece_img, (60, 60)) 
             if piece != 'Rook':
                 self.screen.blit(piece_img, (20+30*count, place[1]))
