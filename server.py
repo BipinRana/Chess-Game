@@ -1,10 +1,13 @@
+import eventlet
+eventlet.monkey_patch()  # Apply monkey patching before importing anything else
+
 from flask import Flask, request
 from flask_socketio import SocketIO
 import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")  # Explicit async mode
 
 clients = {}  # Dictionary to store connected clients
 
