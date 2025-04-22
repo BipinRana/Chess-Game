@@ -10,3 +10,7 @@ Assets used in this project are created by [ToffeeBunny](https://toffeebunny.itc
 The sounds are being used from [Chess](https://chess.com/). 
 
 [Stockfish](https://stockfishchess.org/), the engine used for suggesting moves, is credited to its creators. Visit Stockfish's website for more information.
+
+Update:
+I’ve implemented a basic bot using the alpha-beta pruning algorithm for the easy mode, and integrated Stockfish for the hard difficulty. 
+Additionally, I’ve added online multiplayer functionality, allowing players to compete against each other over the internet.
