@@ -6,3 +6,5 @@ eventlet==0.38.2
 gunicorn==20.1.0
 chess==1.11.1
 python-chess==1.999
+numpy==1.26.4
+pygame==2.5.2
