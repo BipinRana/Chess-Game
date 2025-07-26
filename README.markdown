@@ -49,8 +49,9 @@ To run the game locally:
    ```bash
    pip install -r requirements.txt
    ```
-3. Ensure [Stockfish](https://stockfishchess.org/download/) is installed and properly configured for Hard mode and move suggestions.
-4. Run the game:
+3. Download the Stockfish folder from https://stockfishchess.org/download/.
+4. Place the stockfish folder (containing stockfish-windows-x86-64-avx2.exe or the appropriate executable for their system) in the project root directory (e.g., Chess-Game/).
+5. Run the game:
    ```bash
    python Chess.py
    ```
