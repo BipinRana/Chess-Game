@@ -43,7 +43,7 @@ This project was developed as a solo effort and, while functional, may contain b
 To run the game locally:
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/Chess-Game.git
+   git clone https://github.com/BipinRana/Chess-Game.git
    ```
 2. Install the required dependencies:
    ```bash
@@ -52,7 +52,7 @@ To run the game locally:
 3. Ensure [Stockfish](https://stockfishchess.org/download/) is installed and properly configured for Hard mode and move suggestions.
 4. Run the game:
    ```bash
-   python main.py
+   python Chess.py
    ```
 
 ## Contributing
