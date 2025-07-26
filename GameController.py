@@ -36,7 +36,7 @@ class GameController:
         self.piece_count= {'black_queen':1,'black_bishop':2,'black_knight':2,'black_rook':2,'white_queen':1,'white_bishop':2,'white_knight':2,'white_rook':2}
         self.prev_move_marker = pygame.image.load("Assets/previous_move.png").convert_alpha()  
         self.prev_move_marker = pygame.transform.scale(self.prev_move_marker, (100, 77.6)) 
-        self.stockfish = Stockfish(path=r"C:\Users\LEGION\Desktop\Chess-Game\stockfish\stockfish-windows-x86-64-avx2.exe")
+        self.stockfish = Stockfish(path="stockfish/stockfish-windows-x86-64-avx2.exe")
         self.stockfish.set_fen_position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
         self.suggested_move_marker = pygame.image.load("Assets/suggested_move.png").convert_alpha()  
         self.suggested_move_marker = pygame.transform.scale(self.suggested_move_marker, (100, 77.6))
@@ -695,7 +695,7 @@ class GameController:
                         self.initialize_pieces()
 
                         
-                        self.stockfish = Stockfish(path=r"C:\Users\LEGION\Desktop\Chess-Game\stockfish\stockfish-windows-x86-64-avx2.exe")
+                        self.stockfish = Stockfish(path="stockfish/stockfish-windows-x86-64-avx2.exe")
                         self.menu_over=True
                         
                     #Main Menu
